@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微博歷史快照</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>微博歷史快照</h1>
+        <p>查看微博歷史快照，最新的紀錄在前，滾動加載更多。</p>
+    </header>
+
+    <section id="content">
+        <div id="records-list">
+            <!-- 這裡是紀錄的加載區域 -->
+        </div>
+        <div id="loading" style="display: none;">加載更多...</div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 微博歷史快照</p>
+    </footer>
+
+    <script>
+        // 模擬微博紀錄資料
+        const records = {
+            "2025-02-01": {
+                text: "2025年2月1日的微博紀錄。",
+                image: "image/2025-02-01.jpg"  // 圖片路徑
+            },
+            "2025-01-15": {
+          
