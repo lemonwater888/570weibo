@@ -1,4 +1,20 @@
-<h2 style="text-align: center;">微博快照</h2>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微博快照</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        input[type="text"] { padding: 10px; margin: 20px; width: 80%; max-width: 500px; }
+        #snapshots { max-width: 600px; margin: 0 auto; }
+        .snapshot { padding: 10px; border-bottom: 1px solid #ccc; }
+        #loadMore { display: block; margin: 20px auto; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h2>微博快照</h2>
 <input type="text" id="search" placeholder="輸入日期或關鍵字" onkeyup="searchSnapshots()">
 <div id="snapshots"></div>
 <button id="loadMore">載入更多</button>
@@ -7,36 +23,4 @@
 const snapshots = [
     "2025-02-26-0001.html",
     "2025-02-26-0002.html",
-    "2025-02-25-0001.html",
-    "2025-02-24-0001.html"
-]; // 這裡要用 JavaScript 自動讀取 `docs/snapshots/` 內的檔案
-
-let index = 0;
-const batchSize = 5;
-
-function loadSnapshots() {
-    const container = document.getElementById("snapshots");
-    for (let i = 0; i < batchSize && index < snapshots.length; i++, index++) {
-        const div = document.createElement("div");
-        div.className = "snapshot";
-        div.innerHTML = `<a href="snapshots/${snapshots[index]}" target="_blank">${snapshots[index]}</a>`;
-        container.appendChild(div);
-    }
-    if (index >= snapshots.length) document.getElementById("loadMore").style.display = "none";
-}
-
-function searchSnapshots() {
-    const query = document.getElementById("search").value;
-    const container = document.getElementById("snapshots");
-    container.innerHTML = "";
-    snapshots.filter(name => name.includes(query)).forEach(name => {
-        const div = document.createElement("div");
-        div.className = "snapshot";
-        div.innerHTML = `<a href="snapshots/${name}" target="_blank">${name}</a>`;
-        container.appendChild(div);
-    });
-}
-
-document.getElementById("loadMore").addEventListener("click", loadSnapshots);
-loadSnapshots();
-</script>
+    "202
