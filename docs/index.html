@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 800px;
             margin: 20px auto;
             padding: 10px;
             background-color: #f9f9f9;
@@ -15,9 +15,29 @@
         h1 { text-align: center; }
         input, button { margin: 5px 0; padding: 5px; width: 100%; }
         ul { list-style: none; padding: 0; }
-        li { background: white; margin: 5px 0; padding: 10px; border-radius: 5px; }
-        a { text-decoration: none; color: #007bff; font-weight: bold; }
+        li {
+            background: white;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            margin-right: 20px;
+        }
         a:hover { text-decoration: underline; }
+        img { max-width: 150px; height: auto; border-radius: 5px; }
+        .content {
+            display: flex;
+            flex-direction: column;
+        }
+        .content h3 {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -30,31 +50,45 @@
     <button onclick="filterByDate()">按日期篩選</button>
 
     <ul id="snapshotList">
-        <!-- 這裡 JavaScript 會自動載入快照 -->
+        <!-- 快照列表將由 JavaScript 自動生成 -->
     </ul>
 
     <script>
-        // 快照列表（需手動維護或用 GitHub API 自動取得）
-        const snapshots = [
-            "2025-02-26-0001.html",
-            "2025-02-25-0002.html",
-            "2025-02-24-0003.html",
-            "2025-02-20-0004.html"
-        ];
+        // 加載 snapshots.json
+        async function loadSnapshots() {
+            const response = await fetch('snapshots.json'); // 從 GitHub Pages 讀取 JSON 文件
+            const snapshots = await response.json(); // 解析 JSON
 
-        // 生成快照列表
-        function loadSnapshots() {
             const list = document.getElementById("snapshotList");
-            list.innerHTML = "";
-            snapshots.forEach(file => {
-                let date = file.substring(0, 10); // 取出 YYYY-MM-DD
+            list.innerHTML = ""; // 清空現有內容
+
+            for (let snapshot of snapshots) {
                 let li = document.createElement("li");
-                li.innerHTML = `<a href="snapshots/${file}" target="_blank">${date}</a>`;
+
+                // 加載 HTML 文件並提取圖片
+                let htmlContent = await fetch(snapshot.html).then(res => res.text());
+                let doc = new DOMParser().parseFromString(htmlContent, 'text/html');
+
+                // 提取 HTML 中的所有圖片（假設所有圖片都是 <img> 標籤）
+                let images = Array.from(doc.querySelectorAll('img'));
+                let imageElements = images.map(img => {
+                    return `<img src="${img.src}" alt="圖片" />`;
+                }).join("");
+
+                li.innerHTML = `
+                    <div>
+                        <a href="${snapshot.html}" target="_blank">${snapshot.date}</a>
+                    </div>
+                    <div class="content">
+                        <h3>快照內容: ${snapshot.date}</h3>
+                        ${imageElements}
+                    </div>
+                `;
                 list.appendChild(li);
-            });
+            }
         }
 
-        // 搜尋關鍵字
+        // 搜尋快照
         function filterSnapshots() {
             let input = document.getElementById("searchInput").value.toLowerCase();
             let items = document.querySelectorAll("#snapshotList li");
@@ -64,13 +98,13 @@
             });
         }
 
-        // 依日期篩選
+        // 根據日期篩選
         function filterByDate() {
             let start = document.getElementById("startDate").value;
             let end = document.getElementById("endDate").value;
             let items = document.querySelectorAll("#snapshotList li");
             items.forEach(li => {
-                let date = li.innerText;
+                let date = li.innerText.substring(0, 10); // 取出日期部分
                 li.style.display = (!start || date >= start) && (!end || date <= end) ? "" : "none";
             });
         }
