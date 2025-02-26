@@ -3,70 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>微博快照</title>
+    <title>微博快照列表</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        #searchBox, #dateFilter { margin: 10px; padding: 8px; font-size: 16px; }
-        .snapshot-list { list-style: none; padding: 0; margin-top: 20px; }
-        .snapshot-list li { margin: 5px 0; font-size: 18px; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        h1 { text-align: center; }
+        input, button { margin: 5px 0; padding: 5px; width: 100%; }
+        ul { list-style: none; padding: 0; }
+        li { background: white; margin: 5px 0; padding: 10px; border-radius: 5px; }
+        a { text-decoration: none; color: #007bff; font-weight: bold; }
+        a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <h1>微博快照</h1>
 
-    <input type="text" id="searchBox" placeholder="搜尋關鍵字">
-    <input type="date" id="dateFilter">
-    <ul id="snapshotList" class="snapshot-list"></ul>
+    <h1>微博快照列表</h1>
+
+    <input type="text" id="searchInput" placeholder="🔍 搜尋關鍵字..." onkeyup="filterSnapshots()">
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+    <button onclick="filterByDate()">按日期篩選</button>
+
+    <ul id="snapshotList">
+        <!-- 這裡 JavaScript 會自動載入快照 -->
+    </ul>
 
     <script>
-        const repoOwner = "lemonwater888"; // 你的 GitHub 使用者名稱
-        const repoName = "570weibo"; // 你的倉庫名稱
-        const snapshotsPath = "docs/snapshots"; // 存放快照的資料夾
+        // 快照列表（需手動維護或用 GitHub API 自動取得）
+        const snapshots = [
+            "2025-02-26-0001.html",
+            "2025-02-25-0002.html",
+            "2025-02-24-0003.html",
+            "2025-02-20-0004.html"
+        ];
 
-        async function fetchSnapshots() {
-            const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${snapshotsPath}`;
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error("無法取得快照列表");
-
-                const files = await response.json();
-                return files
-                    .filter(file => file.name.endsWith(".html")) // 只篩選 .html 檔案
-                    .map(file => file.name)
-                    .sort((a, b) => b.localeCompare(a)); // 依日期排序
-            } catch (error) {
-                console.error("獲取快照失敗:", error);
-                return [];
-            }
-        }
-
-        async function loadSnapshots(filter = "") {
-            const snapshots = await fetchSnapshots();
+        // 生成快照列表
+        function loadSnapshots() {
             const list = document.getElementById("snapshotList");
-            list.innerHTML = ""; // 清空列表
-
-            snapshots
-                .filter(name => name.includes(filter)) // 依搜尋條件過濾
-                .forEach(snapshot => {
-                    const date = snapshot.replace(".html", ""); // 取得 YYYY-MM-DD 格式
-                    const li = document.createElement("li");
-                    li.innerHTML = `<a href="snapshots/${snapshot}" target="_blank">${date} 微博快照</a>`;
-                    list.appendChild(li);
-                });
+            list.innerHTML = "";
+            snapshots.forEach(file => {
+                let date = file.substring(0, 10); // 取出 YYYY-MM-DD
+                let li = document.createElement("li");
+                li.innerHTML = `<a href="snapshots/${file}" target="_blank">${date}</a>`;
+                list.appendChild(li);
+            });
         }
 
-        // 監聽搜尋輸入
-        document.getElementById("searchBox").addEventListener("input", (e) => {
-            loadSnapshots(e.target.value);
-        });
+        // 搜尋關鍵字
+        function filterSnapshots() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let items = document.querySelectorAll("#snapshotList li");
+            items.forEach(li => {
+                let text = li.innerText.toLowerCase();
+                li.style.display = text.includes(input) ? "" : "none";
+            });
+        }
 
-        // 監聽日期篩選
-        document.getElementById("dateFilter").addEventListener("change", (e) => {
-            loadSnapshots(e.target.value);
-        });
+        // 依日期篩選
+        function filterByDate() {
+            let start = document.getElementById("startDate").value;
+            let end = document.getElementById("endDate").value;
+            let items = document.querySelectorAll("#snapshotList li");
+            items.forEach(li => {
+                let date = li.innerText;
+                li.style.display = (!start || date >= start) && (!end || date <= end) ? "" : "none";
+            });
+        }
 
-        // 預設載入快照
+        // 頁面載入時顯示快照
         loadSnapshots();
     </script>
+
 </body>
 </html>
